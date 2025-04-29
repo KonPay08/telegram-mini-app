@@ -1,36 +1,39 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 export default function Home() {
-  const [userName, setUserName] = useState<string | null>(null)
-
   useEffect(() => {
     const tg = window.Telegram?.WebApp
     if (!tg) return
 
     tg.ready()
     tg.expand()
-
-    const user = tg.initDataUnsafe?.user
-    if (user) {
-      setUserName(`${user.first_name} ${user.last_name ?? ''}`.trim())
-    }
   }, [])
 
-  const handleSend = () => {
-    window.Telegram.WebApp.sendData('Hello from Next.js Mini App!')
+  const handleFullscreen = () => {
+    const el = document.documentElement
+    if (el.requestFullscreen) {
+      el.requestFullscreen()
+    } else if ((el as any).webkitRequestFullscreen) {
+      (el as any).webkitRequestFullscreen()
+    } else if ((el as any).mozRequestFullScreen) {
+      (el as any).mozRequestFullScreen()
+    } else if ((el as any).msRequestFullscreen) {
+      (el as any).msRequestFullscreen()
+    }
   }
 
   return (
-    <main className="p-6 text-center">
-      <h1 className="text-2xl mb-4">Hello Telegram Mini App 👋</h1>
-      {userName && <p className="mb-4">Welcome, {userName}!</p>}
+    <main className="min-h-screen bg-black text-white p-6 text-center">
+      <h1 className="text-2xl mb-6">Hello Telegram Mini App 👋</h1>
+
       <button
-        onClick={handleSend}
-        className="bg-blue-600 text-white py-2 px-4 rounded"
+        onClick={handleFullscreen}
+        className="bg-blue-600 text-white py-2 px-4 rounded mb-4"
       >
-        sendData() を送信
+        フルスクリーンにする
       </button>
     </main>
   )
