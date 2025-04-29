@@ -1,40 +1,37 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function Home() {
+  const [headerVisible, setHeaderVisible] = useState(false)
+
   useEffect(() => {
     const tg = window.Telegram?.WebApp
     if (!tg) return
 
     tg.ready()
     tg.expand()
-  }, [])
+    tg.setHeaderColor('bg_color')
 
-  const handleFullscreen = () => {
-    const el = document.documentElement
-    if (el.requestFullscreen) {
-      el.requestFullscreen()
-    } else if ((el as any).webkitRequestFullscreen) {
-      (el as any).webkitRequestFullscreen()
-    } else if ((el as any).mozRequestFullScreen) {
-      (el as any).mozRequestFullScreen()
-    } else if ((el as any).msRequestFullscreen) {
-      (el as any).msRequestFullscreen()
-    }
-  }
+    // 0.5秒後に自作ヘッダーを表示（Telegramヘッダーとの切り替え感を演出）
+    const timeout = setTimeout(() => setHeaderVisible(true), 500)
+    return () => clearTimeout(timeout)
+  }, [])
 
   return (
     <main className="min-h-screen bg-black text-white p-6 text-center">
-      <h1 className="text-2xl mb-6">Hello Telegram Mini App 👋</h1>
-
-      <button
-        onClick={handleFullscreen}
-        className="bg-blue-600 text-white py-2 px-4 rounded mb-4"
+      {/* 疑似ヘッダーを遅延表示 */}
+      <div
+        className="fixed top-0 left-0 w-full h-12 bg-black text-white flex items-center justify-between px-4 z-50 transition-opacity duration-500"
+        style={{ opacity: headerVisible ? 1 : 0 }}
       >
-        フルスクリーンにする
-      </button>
+        <span className="text-sm">Hamster Fight Club</span>
+        <button onClick={() => window.Telegram.WebApp.close()} className="text-sm">✕</button>
+      </div>
+
+      <div className="pt-16">
+        <h1 className="text-2xl mb-6">Hello Telegram Mini App 👋</h1>
+      </div>
     </main>
   )
 }

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// src/types/telegram.d.ts
 export {}
 
 declare global {
@@ -36,6 +35,7 @@ declare global {
     close(): void;
     sendData(data: string): void;
     ready(): void;
+    setHeaderColor(colorKey: 'bg_color' | 'secondary_bg_color' | 'button_color'): void;
   }
 
   interface Window {
