@@ -1,33 +1,37 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// app/api/telegram/route.ts
+
 import { NextRequest, NextResponse } from 'next/server'
 import { Telegraf } from 'telegraf'
 
 const bot = new Telegraf(process.env.BOT_TOKEN!)
 
-// ① /play コマンドのハンドラ
+// ✅ /play コマンドでゲーム起動ボタンを送信
 bot.command('play', ctx => {
-  return ctx.reply('▶ Play the game!', {
+  return ctx.replyWithGame('react_game', {
     reply_markup: {
-      inline_keyboard: [[{ text: '▶ Play', callback_game: {} }]]
+      inline_keyboard: [[
+        { text: '▶ Play', callback_game: {} }
+      ]]
     }
   })
 })
 
-// ② callback_query を受けてゲーム URL を返す
+// ✅ ボタン押下時にゲームURLを返す
 bot.on('callback_query', async ctx => {
-  if ((ctx.callbackQuery as any).game_short_name === 'react_game') {
+  const payload = ctx.callbackQuery as any
+  if (payload.game_short_name === 'react_game') {
     await ctx.answerGameQuery('https://telegram-react-game.vercel.app/')
   }
 })
 
-
 export const POST = async (req: NextRequest) => {
-  const body = await req.json()
-  await bot.handleUpdate(body)
-  return NextResponse.json({ ok: true })
-}
-
-export const config = {
-  api: { bodyParser: false }
+  try {
+    const body = await req.json()
+    console.log('🔔 Telegram update received:', JSON.stringify(body))
+    await bot.handleUpdate(body)
+    return NextResponse.json({ ok: true })
+  } catch (error) {
+    console.error('❌ Telegram handler error:', error)
+    return NextResponse.json({ ok: false }, { status: 500 })
+  }
 }
