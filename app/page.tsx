@@ -1,18 +1,19 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { requestFullscreen, init } from '@telegram-apps/sdk'
+import { requestFullscreen, init, viewport } from '@telegram-apps/sdk'
 
 export default function Home() {
   const [headerVisible, setHeaderVisible] = useState(false)
 
   const handleFullscreen = async () => {
+    if (!viewport.isMounted()) return;
     await requestFullscreen()
   }
 
   useEffect(() => {
     init()
-    
+
     const tg = window.Telegram?.WebApp
     if (!tg) return
 
