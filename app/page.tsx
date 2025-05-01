@@ -1,36 +1,29 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { requestFullscreen } from '@telegram-apps/sdk'
 
-// グローバル Window に Telegram.WebApp がある前提
 export default function Home() {
   const [headerVisible, setHeaderVisible] = useState(false)
 
   const handleFullscreen = useCallback(async () => {
-    try {
-      const el = document.documentElement
-      if (el.requestFullscreen) {
-        await el.requestFullscreen()
-      } else if ((el as any).webkitRequestFullscreen) {
-        await (el as any).webkitRequestFullscreen()
-      } else if ((el as any).mozRequestFullScreen) {
-        await (el as any).mozRequestFullScreen()
-      } else if ((el as any).msRequestFullscreen) {
-        await (el as any).msRequestFullscreen()
+    if (requestFullscreen.isAvailable()) {
+      try {
+        await requestFullscreen()
+      } catch (err) {
+        console.error('requestFullscreen failed:', err)
       }
-    } catch (err) {
-      console.error('Fullscreen failed:', err)
+    } else {
+      console.warn('Fullscreen not supported on this platform.')
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
     const tg = window.Telegram?.WebApp
     if (!tg) return
 
     tg.ready()
-    tg.expand()
-    tg.setHeaderColor('bg_color')
+    tg.expand() // Telegram の UIに最適化（SDK版）
     handleFullscreen()
 
     const timeout = setTimeout(() => setHeaderVisible(true), 500)
@@ -54,7 +47,7 @@ export default function Home() {
           onClick={handleFullscreen}
           className="bg-blue-600 text-white py-2 px-4 rounded"
         >
-          フルスクリーンにする
+          フルスクリーンにする（SDK）
         </button>
       </div>
     </main>
