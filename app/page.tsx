@@ -1,15 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { requestFullscreen, init, viewport } from '@telegram-apps/sdk'
+import { init, viewport } from '@telegram-apps/sdk'
 
 export default function Home() {
   const [headerVisible, setHeaderVisible] = useState(false)
-
-  const handleFullscreen = async () => {
-    if (!viewport.isMounted()) return;
-    await requestFullscreen()
-  }
 
   useEffect(() => {
     init()
@@ -18,12 +13,23 @@ export default function Home() {
     if (!tg) return
 
     tg.ready()
-    tg.expand() // Telegram の UIに最適化（SDK版）
-    handleFullscreen()
+    viewport.expand()
 
     const timeout = setTimeout(() => setHeaderVisible(true), 500)
     return () => clearTimeout(timeout)
   }, [])
+
+  const handleFullscreen = async () => {
+    if (viewport.requestFullscreen.isAvailable()) {
+      try {
+        await viewport.requestFullscreen()
+      } catch (err) {
+        console.error('requestFullscreen failed:', err)
+      }
+    } else {
+      console.warn('Fullscreen not supported on this platform.')
+    }
+  }
 
   return (
     <main className="min-h-screen bg-black text-white p-6 text-center">
@@ -42,7 +48,7 @@ export default function Home() {
           onClick={handleFullscreen}
           className="bg-blue-600 text-white py-2 px-4 rounded"
         >
-          フルスクリーンにする（SDK）
+          フルスクリーンにする
         </button>
       </div>
     </main>
