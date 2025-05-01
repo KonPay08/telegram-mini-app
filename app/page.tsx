@@ -7,15 +7,7 @@ export default function Home() {
   const [headerVisible, setHeaderVisible] = useState(false)
 
   const handleFullscreen = async () => {
-    if (requestFullscreen.isAvailable()) {
-      try {
-        await requestFullscreen()
-      } catch (err) {
-        console.error('requestFullscreen failed:', err)
-      }
-    } else {
-      console.warn('Fullscreen not supported on this platform.')
-    }
+    await requestFullscreen()
   }
 
   useEffect(() => {
