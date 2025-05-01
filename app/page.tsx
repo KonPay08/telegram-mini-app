@@ -1,12 +1,12 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { requestFullscreen } from '@telegram-apps/sdk'
 
 export default function Home() {
   const [headerVisible, setHeaderVisible] = useState(false)
 
-  const handleFullscreen = useCallback(async () => {
+  const handleFullscreen = async () => {
     if (requestFullscreen.isAvailable()) {
       try {
         await requestFullscreen()
@@ -16,7 +16,7 @@ export default function Home() {
     } else {
       console.warn('Fullscreen not supported on this platform.')
     }
-  }, [])
+  }
 
   useEffect(() => {
     const tg = window.Telegram?.WebApp
@@ -28,7 +28,7 @@ export default function Home() {
 
     const timeout = setTimeout(() => setHeaderVisible(true), 500)
     return () => clearTimeout(timeout)
-  }, [handleFullscreen])
+  }, [])
 
   return (
     <main className="min-h-screen bg-black text-white p-6 text-center">
